@@ -1,7 +1,13 @@
 const { Client, GatewayIntentBits } = require('discord.js');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
+const sodium = require('libsodium-wrappers');  // Import libsodium-wrappers
 require('dotenv').config();
+
+// Initialize libsodium-wrappers
+sodium.ready.then(() => {
+    console.log('libsodium-wrappers initialized.');
+});
 
 const client = new Client({
     intents: [
@@ -11,10 +17,6 @@ const client = new Client({
         GatewayIntentBits.MessageContent
     ]
 });
-
-let connection;
-let player;
-let currentResource;
 
 client.once('ready', () => {
     console.log('Bot is online!');
@@ -40,17 +42,17 @@ client.on('messageCreate', async (message) => {
             return;
         }
         
-        connection = joinVoiceChannel({
+        const connection = joinVoiceChannel({
             channelId: voiceChannel.id,
             guildId: message.guild.id,
             adapterCreator: message.guild.voiceAdapterCreator,
         });
         
         const stream = ytdl(url, { filter: 'audioonly' });
-        player = createAudioPlayer();
-        currentResource = createAudioResource(stream);
+        const player = createAudioPlayer();
+        const resource = createAudioResource(stream);
         
-        player.play(currentResource);
+        player.play(resource);
         connection.subscribe(player);
         
         player.on('error', error => {
@@ -58,30 +60,6 @@ client.on('messageCreate', async (message) => {
         });
         
         message.reply(`Now playing: ${url}`);
-    } else if (message.content === '!stop') {
-        if (player) {
-            player.stop();
-            connection.destroy();
-            message.reply('Stopped playing and left the voice channel.');
-        } else {
-            message.reply('No audio is currently playing.');
-        }
-    } else if (message.content === '!pause') {
-        if (player && player.state.status === AudioPlayerStatus.Playing) {
-            player.pause();
-            message.reply('Paused the current audio.');
-        } else {
-            message.reply('No audio is currently playing.');
-        }
-    } else if (message.content === '!resume') {
-        if (player && player.state.status === AudioPlayerStatus.Paused) {
-            player.unpause();
-            message.reply('Resumed the current audio.');
-        } else {
-            message.reply('No audio is currently paused.');
-        }
-    } else if (message.content === '!help') {
-        message.reply('Available commands:\n!play [YouTube URL]\n!stop\n!pause\n!resume\n!help');
     }
 });
 
