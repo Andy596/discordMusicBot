@@ -1,10 +1,9 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
 const ytdl = require('ytdl-core');
-const sodium = require('libsodium-wrappers');  // Import libsodium-wrappers
+const sodium = require('libsodium-wrappers'); 
 require('dotenv').config();
 
-// Initialize libsodium-wrappers
 sodium.ready.then(() => {
     console.log('libsodium-wrappers initialized.');
 });
