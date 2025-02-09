@@ -7,4 +7,3 @@ https://discord.com/oauth2/authorize?client_id=1245182366528307312&permissions=8
 !pause: Pauses the current audio.
 !resume: Resumes the paused audio.
 !help: Lists all available commands.
-i can now make discord bot if you need just tell me what you want to do and i can do it
